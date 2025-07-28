@@ -8,7 +8,7 @@ from airflow.providers.standard.operators.bash import BashOperator
 with DAG(
     dag_id="01_hello_world",
     start_date=datetime(2025, 1, 1),
-    schedule_interval="@daily",
+    schedule="@daily",
     catchup=False,
     tags=["level0", "tutorial"],
 ):

@@ -1,4 +1,5 @@
-version: '3.8'
+# Remove the version line as it's obsolete
+# version: '3.8'
 
 # ----
 # Common Configuration Template
@@ -9,6 +10,7 @@ x-airflow-common:
     context: .
     dockerfile: Dockerfile
   environment:
+    &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
@@ -95,6 +97,7 @@ services:
         chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins,config}
         exec /entrypoint airflow version
     environment:
+      <<: *airflow-common-env  # ← KEY FIX: Use the same environment
       _AIRFLOW_DB_MIGRATE: 'true'
       _AIRFLOW_WWW_USER_CREATE: 'true'
       _AIRFLOW_WWW_USER_USERNAME: airflow
@@ -102,6 +105,9 @@ services:
     user: "0:0"
     volumes:
       - .:/sources
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 # ----
 # Named Volumes
